@@ -83,3 +83,30 @@ jobs:
       - name: dbt test
         working-directory: my_dbt_project
         run: dbt test --profiles-dir ~/.dbt --target ${DBT_TARGET}        
+
+      - name: Configure dbt profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<EOF
+          my_dbt_project:
+            target: ${DBT_TARGET}
+            outputs:
+              dev:
+                type: snowflake
+                account: ${{ secrets.SF_DEV_ACCOUNT }}
+                user:    ${{ secrets.SF_DEV_USER }}
+                password: ${{ secrets.SF_DEV_PASSWORD }}
+                role:    ${{ secrets.SF_DEV_ROLE }}
+                database: ${{ secrets.SF_DEV_DATABASE }}
+                warehouse: ${{ secrets.SF_DEV_WAREHOUSE }}
+                schema:   ${{ secrets.SF_DEV_SCHEMA }}
+                threads:  4
+              prod:
+                …  
+          EOF
+
+      - name: Debug: print generated profiles.yml
+        run: |
+          echo "---- BEGIN profiles.yml ----"
+          sed -e 's/password:.*/password: "***"/' ~/.dbt/profiles.yml
+          echo "----  END profiles.yml  ----"
