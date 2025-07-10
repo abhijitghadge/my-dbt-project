@@ -83,3 +83,9 @@ jobs:
       - name: dbt test
         working-directory: my_dbt_project
         run: dbt test --profiles-dir ~/.dbt --target ${DBT_TARGET}
+        
+      - name: Debug print generated yml
+        run: |
+          echo "---- BEGIN profiles.yml ----"
+          sed -e 's/password:.*/password: "***"/' ~/.dbt/profiles.yml
+          echo "----  END profiles.yml  ----"
